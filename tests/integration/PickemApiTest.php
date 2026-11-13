@@ -120,6 +120,20 @@ class PickemApiTest extends TestCase
     }
 
     #[Test]
+    public function deletingAnUnfinishedMatchWithPicksRefreshesScores(): void
+    {
+        $this->assertSame(201, $this->api('POST', '/pickem-picks', 2, [
+            'eventId' => 1, 'selectedOutcome' => 'home', 'predictedHomeScore' => 2, 'predictedAwayScore' => 0,
+        ])->getStatusCode());
+
+        $response = $this->api('DELETE', '/pickem-events/1');
+        $this->assertSame(204, $response->getStatusCode(), (string) $response->getBody());
+        $this->assertFalse(Event::where('id', 1)->exists());
+        $this->assertSame(0, Pick::where('user_id', 2)->count());
+        $this->assertEquals(0, UserScore::where('user_id', 2)->firstOrFail()->total_points);
+    }
+
+    #[Test]
     public function exactScoresCanBeEditedClearedAndValidated(): void
     {
         $attributes = ['eventId' => 1, 'selectedOutcome' => 'home', 'predictedHomeScore' => 2, 'predictedAwayScore' => 0];

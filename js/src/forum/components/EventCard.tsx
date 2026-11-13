@@ -148,15 +148,17 @@ export default class EventCard extends Component<EventCardAttrs> {
         )}
 
         {pick && canPick && (
-          <PredictedScoreForm
-            key={`${pick.id()}-${pick.selectedOutcome()}`}
-            pick={pick}
-            firstTeam={String(firstTeam ? firstTeam.name() : firstTeamLabel)}
-            secondTeam={String(secondTeam ? secondTeam.name() : secondTeamLabel)}
-            reverse={reverse}
-            isLoading={isLoading}
-            onSave={(home: number | null, away: number | null) => onSaveScore(Number(event.id()), home, away)}
-          />
+          <div>
+            <PredictedScoreForm
+              key={`${pick.id()}-${pick.selectedOutcome()}`}
+              pick={pick}
+              firstTeam={String(firstTeam ? firstTeam.name() : firstTeamLabel)}
+              secondTeam={String(secondTeam ? secondTeam.name() : secondTeamLabel)}
+              reverse={reverse}
+              isLoading={isLoading}
+              onSave={(home: number | null, away: number | null) => onSaveScore(Number(event.id()), home, away)}
+            />
+          </div>
         )}
 
         {pick && !canPick && (

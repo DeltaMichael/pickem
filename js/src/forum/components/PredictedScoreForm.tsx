@@ -14,16 +14,32 @@ interface PredictedScoreFormAttrs {
 export default class PredictedScoreForm extends Component<PredictedScoreFormAttrs> {
   private first = '';
   private second = '';
+  private editing = true;
 
   oninit(vnode: any) {
     super.oninit(vnode);
     const { pick, reverse } = this.attrs;
     this.first = String((reverse ? pick.predictedAwayScore() : pick.predictedHomeScore()) ?? '');
     this.second = String((reverse ? pick.predictedHomeScore() : pick.predictedAwayScore()) ?? '');
+    this.editing = pick.predictedHomeScore() == null || pick.predictedAwayScore() == null;
   }
 
   view() {
     const { pick, reverse, firstTeam, secondTeam, isLoading, onSave } = this.attrs;
+    if (!this.editing) {
+      return (
+        <div className="EventCard-predictedScore">
+          <div>
+            {app.translator.trans('huseyinfiliz-pickem.forum.picks.exact_score')}: {reverse ? pick.predictedAwayScore() : pick.predictedHomeScore()} -{' '}
+            {reverse ? pick.predictedHomeScore() : pick.predictedAwayScore()}
+          </div>
+          <Button className="Button" onclick={() => (this.editing = true)}>
+            {app.translator.trans('huseyinfiliz-pickem.forum.picks.edit_score')}
+          </Button>
+        </div>
+      );
+    }
+
     return (
       <form
         className="EventCard-predictedScore"
@@ -35,7 +51,12 @@ export default class PredictedScoreForm extends Component<PredictedScoreFormAttr
             app.alerts.show({ type: 'error' }, app.translator.trans('huseyinfiliz-pickem.lib.messages.invalid_predicted_scores'));
             return;
           }
-          onSave(reverse ? second : first, reverse ? first : second);
+          onSave(reverse ? second : first, reverse ? first : second).then((saved) => {
+            if (saved) {
+              this.editing = false;
+              m.redraw();
+            }
+          });
         }}
       >
         <div>{app.translator.trans('huseyinfiliz-pickem.forum.picks.exact_score')}</div>

@@ -102,6 +102,7 @@ huseyinfiliz-pickem:
       your_pick: "Your Pick"
       exact_score: "Exact score (optional, 2 points)"
       save_score: "Save score"
+      edit_score: "Edit score"
       clear_score: "Clear score"
       exact_correct: "Exact score: 2 points"
     notification: "Result: {home} {hScore} - {aScore} {away}"
