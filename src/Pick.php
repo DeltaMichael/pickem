@@ -12,6 +12,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property int $user_id
  * @property int $event_id
  * @property string $selected_outcome
+ * @property int|null $predicted_home_score
+ * @property int|null $predicted_away_score
  * @property bool|null $is_correct
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
@@ -32,11 +34,15 @@ class Pick extends AbstractModel
         'user_id',
         'event_id',
         'selected_outcome',
+        'predicted_home_score',
+        'predicted_away_score',
         'is_correct'
     ];
 
     protected $casts = [
         'is_correct' => 'boolean',
+        'predicted_home_score' => 'integer',
+        'predicted_away_score' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];

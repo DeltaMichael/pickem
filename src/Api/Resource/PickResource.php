@@ -24,6 +24,8 @@ class PickResource extends AbstractDatabaseResource
             Schema\Integer::make('userId'),
             Schema\Integer::make('eventId'),
             Schema\Str::make('selectedOutcome'),
+            Schema\Integer::make('predictedHomeScore')->nullable(),
+            Schema\Integer::make('predictedAwayScore')->nullable(),
             Schema\Boolean::make('isCorrect')->nullable(),
             Schema\DateTime::make('createdAt'),
             Schema\DateTime::make('updatedAt'),

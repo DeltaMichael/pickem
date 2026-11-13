@@ -75,16 +75,18 @@ class PickemScoringService
     public function recalculateUserScore(int $userId): void
     {
         // 1. İstatistikleri veritabanı seviyesinde hesapla (Daha performanslı)
-        $stats = Pick::where('user_id', $userId)
-            ->selectRaw('count(*) as total, sum(case when is_correct = ? then 1 else 0 end) as correct', [true])
-            ->whereNotNull('is_correct') // Sadece sonuçlanmış maçlar
+        $stats = Pick::query()
+            ->join('pickem_events', 'pickem_events.id', '=', 'pickem_picks.event_id')
+            ->where('pickem_picks.user_id', $userId)
+            ->selectRaw('count(*) as total, sum(case when pickem_picks.is_correct = ? then 1 else 0 end) as correct', [true])
+            ->selectRaw('sum(case when pickem_picks.is_correct = ? and pickem_picks.predicted_home_score = pickem_events.home_score and pickem_picks.predicted_away_score = pickem_events.away_score then 1 else 0 end) as exact', [true])
+            ->whereNotNull('pickem_picks.is_correct')
             ->first();
 
         $totalPicks = $stats ? (int) $stats->total : 0;
         $correctPicks = $stats ? (int) $stats->correct : 0;
 
-        // Puanlama sistemi: Her doğru tahmin 1 puan
-        $totalPoints = $correctPicks;
+        $totalPoints = $correctPicks + ($stats ? (int) $stats->exact : 0);
 
         // Accuracy hesaplama
         $accuracy = $totalPicks > 0 ? round(($correctPicks / $totalPicks) * 100, 2) : 0;

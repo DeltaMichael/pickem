@@ -6,6 +6,8 @@ export default class Pick extends Model {
   userId = Model.attribute<string | number>('userId');
   eventId = Model.attribute<string | number>('eventId');
   selectedOutcome = Model.attribute<'home' | 'away' | 'draw'>('selectedOutcome');
+  predictedHomeScore = Model.attribute<number | null>('predictedHomeScore');
+  predictedAwayScore = Model.attribute<number | null>('predictedAwayScore');
   isCorrect = Model.attribute<boolean | null>('isCorrect');
 
   event = Model.hasOne<PickemEvent>('event');

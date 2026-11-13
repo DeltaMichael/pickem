@@ -8,6 +8,7 @@ use HuseyinFiliz\Pickem\Api\Resource\PickResource;
 use HuseyinFiliz\Pickem\Event;
 use HuseyinFiliz\Pickem\Job\RecalculateUserScoreJob;
 use HuseyinFiliz\Pickem\Pick;
+use HuseyinFiliz\Pickem\PredictedScore;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Support\Arr;
@@ -18,7 +19,7 @@ class CreatePickController extends AbstractCreateController
     public $resource = PickResource::class;
     public $include = ['event', 'event.homeTeam', 'event.awayTeam', 'user'];
 
-    public function __construct(protected Dispatcher $bus, protected Translator $translator)
+    public function __construct(protected Dispatcher $bus, protected Translator $translator, protected PredictedScore $scores)
     {
     }
 
@@ -64,6 +65,7 @@ class CreatePickController extends AbstractCreateController
         $isUpdate = $pick->exists;
         $recalculateScore = false;
 
+        $this->scores->apply($pick, $data, $selectedOutcome);
         $pick->selected_outcome = $selectedOutcome;
 
         if ($isUpdate && $pick->isDirty('selected_outcome')) {

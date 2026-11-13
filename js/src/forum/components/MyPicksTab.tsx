@@ -113,7 +113,16 @@ export default class MyPicksTab extends Component<MyPicksTabAttrs> {
 
                   <div className="PickemList-cell type-pick">
                     <span className="mobile-label">{app.translator.trans('huseyinfiliz-pickem.forum.picks.your_pick')}</span>
-                    <span className="value">{this.formatResult(pick.selectedOutcome(), homeTeam, awayTeam)}</span>
+                    <span className="value">
+                      {this.formatResult(pick.selectedOutcome(), homeTeam, awayTeam)}
+                      {pick.predictedHomeScore() != null && pick.predictedAwayScore() != null && (
+                        <span>
+                          {' '}
+                          ({reverse ? pick.predictedAwayScore() : pick.predictedHomeScore()} -{' '}
+                          {reverse ? pick.predictedHomeScore() : pick.predictedAwayScore()})
+                        </span>
+                      )}
+                    </span>
                   </div>
 
                   <div className="PickemList-cell type-result">

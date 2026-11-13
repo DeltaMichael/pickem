@@ -7,6 +7,7 @@ import PickemEvent from '../../common/models/Event';
 import Season from '../../common/models/Season';
 import Team from '../../common/models/Team';
 import Week from '../../common/models/Week';
+import Pick from '../../common/models/Pick';
 
 interface IMatchesTabAttrs {
   picks: Record<string, any>;
@@ -169,6 +170,28 @@ export default class MatchesTab extends Component<IMatchesTabAttrs> {
     }
   }
 
+  async saveScore(eventId: number, home: number | null, away: number | null) {
+    const pick: Pick = this.attrs.picks[String(eventId)];
+    this.pickLoading.add(eventId);
+    m.redraw();
+    try {
+      const updated = await pick.save({ selectedOutcome: pick.selectedOutcome(), predictedHomeScore: home, predictedAwayScore: away });
+      this.attrs.onPickChange({ ...this.attrs.picks, [String(eventId)]: updated });
+      app.alerts.show({ type: 'success' }, app.translator.trans('huseyinfiliz-pickem.lib.messages.saved'));
+      return true;
+    } catch (error: any) {
+      console.error('Score prediction error:', error);
+      app.alerts.show(
+        { type: 'error' },
+        error.response?.errors?.[0]?.detail || app.translator.trans('huseyinfiliz-pickem.lib.messages.invalid_predicted_scores')
+      );
+      return false;
+    } finally {
+      this.pickLoading.delete(eventId);
+      m.redraw();
+    }
+  }
+
   view() {
     const allSeasons = app.store.all<Season>('pickem-seasons');
     const allTeams = app.store.all<Team>('pickem-teams');
@@ -285,9 +308,11 @@ export default class MatchesTab extends Component<IMatchesTabAttrs> {
 
               return (
                 <EventCard
+                  key={eventIdStr}
                   event={event}
                   pick={pick}
                   onMakePick={(eventId: number, outcome: string) => this.makePick(eventId, outcome)}
+                  onSaveScore={(eventId: number, home: number | null, away: number | null) => this.saveScore(eventId, home, away)}
                   isLoading={isLoading}
                 />
               );

@@ -4,17 +4,19 @@ import Team from '../../common/models/Team';
 import PickemEvent from '../../common/models/Event';
 import Pick from '../../common/models/Pick';
 import dayjs from 'dayjs';
+import PredictedScoreForm from './PredictedScoreForm';
 
 interface EventCardAttrs {
   event: PickemEvent;
   pick?: Pick;
   onMakePick: (eventId: number, outcome: string) => Promise<void>;
+  onSaveScore: (eventId: number, home: number | null, away: number | null) => Promise<boolean>;
   isLoading: boolean;
 }
 
 export default class EventCard extends Component<EventCardAttrs> {
   view() {
-    const { event, pick, onMakePick, isLoading } = this.attrs;
+    const { event, pick, onMakePick, onSaveScore, isLoading } = this.attrs;
 
     if (!event || typeof event.id !== 'function') {
       return null;
@@ -145,10 +147,29 @@ export default class EventCard extends Component<EventCardAttrs> {
           </div>
         )}
 
+        {pick && canPick && (
+          <PredictedScoreForm
+            key={`${pick.id()}-${pick.selectedOutcome()}`}
+            pick={pick}
+            firstTeam={String(firstTeam ? firstTeam.name() : firstTeamLabel)}
+            secondTeam={String(secondTeam ? secondTeam.name() : secondTeamLabel)}
+            reverse={reverse}
+            isLoading={isLoading}
+            onSave={(home: number | null, away: number | null) => onSaveScore(Number(event.id()), home, away)}
+          />
+        )}
+
         {pick && !canPick && (
           <div className="EventCard-pick-result">
             {app.translator.trans('huseyinfiliz-pickem.forum.picks.your_pick')}:{' '}
             <strong>{this.formatResult(pick.selectedOutcome(), homeTeam, awayTeam)}</strong>
+            {pick.predictedHomeScore() != null && pick.predictedAwayScore() != null && (
+              <span>
+                {' '}
+                ({reverse ? pick.predictedAwayScore() : pick.predictedHomeScore()} - {reverse ? pick.predictedHomeScore() : pick.predictedAwayScore()}
+                )
+              </span>
+            )}
             {pick.isCorrect() !== null && (
               <span className={pick.isCorrect() ? 'correct' : 'incorrect'}>
                 {pick.isCorrect()
@@ -156,6 +177,10 @@ export default class EventCard extends Component<EventCardAttrs> {
                   : ` ✗ ${app.translator.trans('huseyinfiliz-pickem.lib.status.incorrect')}`}
               </span>
             )}
+            {pick.isCorrect() &&
+              pick.predictedHomeScore() != null &&
+              pick.predictedHomeScore() === homeScore &&
+              pick.predictedAwayScore() === awayScore && <div>{app.translator.trans('huseyinfiliz-pickem.forum.picks.exact_correct')}</div>}
           </div>
         )}
       </div>

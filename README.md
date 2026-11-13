@@ -78,7 +78,8 @@ To remove simply run `composer remove huseyinfiliz/pickem`
 1.  Navigate to the **Pick'em** page from the sidebar
 2.  Browse the **Matches** tab to see upcoming events
 3.  Click on **Home**, **Draw**, or **Away** buttons to make your prediction
-4.  Visit **My Picks** to track your history and **Leaderboard** to see your ranking
+4.  Optionally enter both predicted scores and save them; the score must match your selected outcome. You can edit or clear the score before the cutoff.
+5.  Visit **My Picks** to track your history and **Leaderboard** to see your ranking
 
 ### For Admins
 
@@ -134,7 +135,7 @@ Navigate to **Admin → Pick'em** to configure the system. The admin panel is di
 
 #### Scoring System
 
-  - **Points**: Users earn **1 point** for every correct prediction.
+  - **Points**: A correct outcome earns **1 point**, or **2 points total** if the optional predicted score is also exact. Existing outcome-only picks remain worth 1 point.
   - **Accuracy**: Calculated as `(Correct Picks / Total Picks) * 100`.
   - **Ranking**: The leaderboard is sorted by Total Points (primary) and Correct Pick count (secondary).
 

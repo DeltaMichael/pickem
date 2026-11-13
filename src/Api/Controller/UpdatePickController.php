@@ -8,6 +8,7 @@ use HuseyinFiliz\Pickem\Api\Resource\PickResource;
 use HuseyinFiliz\Pickem\Event;
 use HuseyinFiliz\Pickem\Job\RecalculateUserScoreJob;
 use HuseyinFiliz\Pickem\Pick;
+use HuseyinFiliz\Pickem\PredictedScore;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Support\Arr;
@@ -18,7 +19,7 @@ class UpdatePickController extends AbstractShowController
     public $resource = PickResource::class;
     public $include = ['event', 'event.homeTeam', 'event.awayTeam', 'user'];
 
-    public function __construct(protected Dispatcher $bus, protected Translator $translator)
+    public function __construct(protected Dispatcher $bus, protected Translator $translator, protected PredictedScore $scores)
     {
     }
 
@@ -40,11 +41,7 @@ class UpdatePickController extends AbstractShowController
         $actor->assertCan('edit', $pick);
 
         $data = Arr::get($request->getParsedBody(), 'data.attributes', []);
-        $selectedOutcome = Arr::get($data, 'selectedOutcome');
-
-        if (! $selectedOutcome) {
-            return $pick;
-        }
+        $selectedOutcome = Arr::get($data, 'selectedOutcome', $pick->selected_outcome);
 
         // Beraberlik kontrolü
         if (Event::RESULT_DRAW === $selectedOutcome && ! $pick->event->allow_draw) {
@@ -58,6 +55,7 @@ class UpdatePickController extends AbstractShowController
         }
 
         $recalculateScore = false;
+        $this->scores->apply($pick, $data, $selectedOutcome);
 
         if ($pick->selected_outcome !== $selectedOutcome) {
             $pick->selected_outcome = $selectedOutcome;
