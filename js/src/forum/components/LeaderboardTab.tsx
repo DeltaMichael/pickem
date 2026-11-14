@@ -141,6 +141,7 @@ export default class LeaderboardTab extends Component<LeaderboardTabAttrs> {
           <div className="PickemList-cell type-player">{app.translator.trans('huseyinfiliz-pickem.lib.headers.player')}</div>
           <div className="PickemList-cell type-stat">{app.translator.trans('huseyinfiliz-pickem.lib.common.points')}</div>
           <div className="PickemList-cell type-stat">{app.translator.trans('huseyinfiliz-pickem.lib.headers.correct')}</div>
+          <div className="PickemList-cell type-stat">{app.translator.trans('huseyinfiliz-pickem.lib.headers.exact_scores')}</div>
           <div className="PickemList-cell type-stat">{app.translator.trans('huseyinfiliz-pickem.lib.headers.total')}</div>
           <div className="PickemList-cell type-stat">{app.translator.trans('huseyinfiliz-pickem.lib.headers.accuracy')}</div>
         </div>
@@ -152,6 +153,7 @@ export default class LeaderboardTab extends Component<LeaderboardTabAttrs> {
 
             const totalPoints = typeof score.totalPoints === 'function' ? score.totalPoints() : score.totalPoints;
             const correctPicks = typeof score.correctPicks === 'function' ? score.correctPicks() : score.correctPicks;
+            const exactScoreCount = typeof score.exactScoreCount === 'function' ? score.exactScoreCount() : score.exactScoreCount;
             const totalPicks = typeof score.totalPicks === 'function' ? score.totalPicks() : score.totalPicks;
             const accuracy = typeof score.accuracy === 'function' ? score.accuracy() : 0;
             const isMe = app.session.user && user && app.session.user.id() === user.id();
@@ -186,6 +188,11 @@ export default class LeaderboardTab extends Component<LeaderboardTabAttrs> {
                 <div className="PickemList-cell type-stat">
                   <span className="mobile-label">{app.translator.trans('huseyinfiliz-pickem.lib.headers.correct')}</span>
                   <span className="value">{correctPicks}</span>
+                </div>
+
+                <div className="PickemList-cell type-stat">
+                  <span className="mobile-label">{app.translator.trans('huseyinfiliz-pickem.lib.headers.exact_scores')}</span>
+                  <span className="value">{exactScoreCount}</span>
                 </div>
 
                 <div className="PickemList-cell type-stat">

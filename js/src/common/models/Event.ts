@@ -10,6 +10,8 @@ export default class PickemEvent extends Model {
   matchDate = Model.attribute<Date | null>('matchDate', transformDate);
   cutoffDate = Model.attribute<Date | null>('cutoffDate', transformDate);
   allowDraw = Model.attribute<boolean>('allowDraw');
+  isSpecial = Model.attribute<boolean>('isSpecial');
+  newScoring = Model.attribute<boolean>('newScoring');
   status = Model.attribute<'scheduled' | 'closed' | 'finished'>('status');
   homeScore = Model.attribute<number | null>('homeScore');
   awayScore = Model.attribute<number | null>('awayScore');

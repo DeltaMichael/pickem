@@ -48,6 +48,7 @@ Build the frontend from `js/` with `yarn install`, `yarn build` and `yarn check-
 - 🎯 **Match Predictions**: Users can predict Home Win, Away Win, or Draw results
 - 🏆 **Leaderboard**: Automatic global ranking system based on correct predictions
 - 📊 **User Statistics**: Track accuracy rates, total points, and correct pick counts
+- 🎯 **Exact Scores**: The leaderboard counts correctly predicted exact scores separately; these also count as correct outcomes.
 - ⚡ **Live Status**: Real-time match status (Scheduled, Closed, Finished)
 - ⏰ **Cutoff Control**: Automatic locking of picks when the match start time is reached
 - 📱 **Responsive Design**: Fully optimized card-based layout for mobile devices
@@ -108,6 +109,7 @@ Navigate to **Admin → Pick'em** to configure the system. The admin panel is di
   - **Allow Draw**: Toggle whether a "Draw" option is available for prediction
   - **Status**: Manually manage statuses (Scheduled, Closed, Finished)
   - **Enter Results**: Input scores after the match to automatically calculate points
+  - **Import matches**: Select a season and one of its weeks, then paste one match per line as `home_slug, away_slug, start_time`. An optional header uses those same column names. Missing teams are created without logos using their slugs as names. New slugs must be at most 100 characters, using lowercase letters and digits separated by hyphens. Enter dates as `YYYY-MM-DD HH:mm` in the browser's local time zone. Each cutoff is one minute before the start and draws are allowed. The import is atomic: correct any reported errors and retry; no teams or matches are created if a row is invalid. Up to 200 matches (64 KB) can be imported at once.
 
 #### Settings Tab
 
@@ -135,7 +137,9 @@ Navigate to **Admin → Pick'em** to configure the system. The admin panel is di
 
 #### Scoring System
 
-  - **Points**: A correct outcome earns **1 point**, or **2 points total** if the optional predicted score is also exact. Existing outcome-only picks remain worth 1 point.
+  - **Points for new matches**: A correct winner earns **1 point**, a correct draw **1.5 points**, and an exact score adds **3 points**. A special match doubles its match points, but not weekly bonuses.
+  - **Weekly bonuses**: Once every match in a week is finished, predicting every outcome earns **10 points**; predicting every exact score adds **20 more**. A pick is required for every match. Bonuses apply only to weeks consisting entirely of matches using the new rules.
+  - **Existing matches** retain their previous scoring (1 point for a correct outcome, 2 total for an exact score), including during recalculation. Matches created after the scoring migration use the new rules.
   - **Accuracy**: Calculated as `(Correct Picks / Total Picks) * 100`.
   - **Ranking**: The leaderboard is sorted by Total Points (primary) and Correct Pick count (secondary).
 

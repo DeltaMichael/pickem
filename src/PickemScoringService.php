@@ -2,6 +2,7 @@
 
 namespace HuseyinFiliz\Pickem;
 
+use Flarum\User\User;
 use Illuminate\Database\ConnectionInterface; // DÜZELTME: Facade yerine Interface
 
 /**
@@ -24,9 +25,12 @@ class PickemScoringService
         // Transaction kullanarak veri bütünlüğünü sağlayalım
         // DÜZELTME: DB::transaction yerine $this->db->transaction
         $this->db->transaction(function () use ($event) {
-            $this->updatePicksForEvent($event);
-            $this->updateUserScoresForEvent($event);
+            $current = Event::whereKey($event->id)->lockForUpdate()->first();
+            if ($current) {
+                $this->updatePicksForEvent($current);
+            }
         });
+        $this->updateUserScoresForEvent($event);
     }
 
     /**
@@ -36,7 +40,7 @@ class PickemScoringService
     protected function updatePicksForEvent(Event $event): void
     {
         // Sonuç null ise (örn: iptal edildi veya geri alındı), is_correct null olmalı
-        if (null === $event->result) {
+        if (! $event->isFinished() || null === $event->result) {
             Pick::where('event_id', $event->id)->update(['is_correct' => null]);
 
             return;
@@ -74,25 +78,61 @@ class PickemScoringService
      */
     public function recalculateUserScore(int $userId): void
     {
-        $grammar = $this->db->getQueryGrammar();
-        $correct = $grammar->wrap('pickem_picks.is_correct');
-        $predictedHome = $grammar->wrap('pickem_picks.predicted_home_score');
-        $predictedAway = $grammar->wrap('pickem_picks.predicted_away_score');
-        $homeScore = $grammar->wrap('pickem_events.home_score');
-        $awayScore = $grammar->wrap('pickem_events.away_score');
+        $this->db->transaction(function () use ($userId) {
+            User::whereKey($userId)->lockForUpdate()->firstOrFail();
+            $this->calculateUserScore($userId);
+        });
+    }
 
-        $stats = Pick::query()
-            ->join('pickem_events', 'pickem_events.id', '=', 'pickem_picks.event_id')
-            ->where('pickem_picks.user_id', $userId)
-            ->selectRaw("count(*) as total, sum(case when $correct = ? then 1 else 0 end) as correct", [true])
-            ->selectRaw("sum(case when $correct = ? and $predictedHome = $homeScore and $predictedAway = $awayScore then 1 else 0 end) as exact", [true])
-            ->whereNotNull('pickem_picks.is_correct')
-            ->first();
+    protected function calculateUserScore(int $userId): void
+    {
+        $picks = Pick::where('user_id', $userId)->with('event')->get();
+        $totalPicks = 0;
+        $correctPicks = 0;
+        $halfPoints = 0;
+        foreach ($picks as $pick) {
+            $event = $pick->event;
+            if (! $event || ! $event->isFinished() || null === $event->result) {
+                continue;
+            }
+            $totalPicks++;
+            if ($pick->selected_outcome !== $event->result) {
+                continue;
+            }
+            $correctPicks++;
+            $exact = null !== $pick->predicted_home_score && null !== $pick->predicted_away_score
+                && $pick->predicted_home_score === $event->home_score && $pick->predicted_away_score === $event->away_score;
+            if (! $event->new_scoring) {
+                $halfPoints += 2 + ($exact ? 2 : 0);
+            } else {
+                $matchPoints = (Event::RESULT_DRAW === $event->result ? 3 : 2) + ($exact ? 6 : 0);
+                $halfPoints += $matchPoints * ($event->is_special ? 2 : 1);
+            }
+        }
 
-        $totalPicks = $stats ? (int) $stats->total : 0;
-        $correctPicks = $stats ? (int) $stats->correct : 0;
-
-        $totalPoints = $correctPicks + ($stats ? (int) $stats->exact : 0);
+        $weekIds = $picks->map(fn (Pick $pick) => $pick->event?->week_id)->filter(fn ($id) => null !== $id)->unique()->values();
+        $weeks = Event::whereIn('week_id', $weekIds)->get()->groupBy('week_id');
+        $picksByEvent = $picks->keyBy('event_id');
+        foreach ($weeks as $events) {
+            $allCorrect = true;
+            $allExact = true;
+            foreach ($events as $event) {
+                $pick = $picksByEvent->get($event->id);
+                if (! $event->new_scoring || ! $event->isFinished() || null === $event->result
+                    || ! $pick || $pick->selected_outcome !== $event->result) {
+                    $allCorrect = false;
+                    break;
+                }
+                if (null === $pick->predicted_home_score || null === $pick->predicted_away_score
+                    || $pick->predicted_home_score !== $event->home_score || $pick->predicted_away_score !== $event->away_score) {
+                    $allExact = false;
+                }
+            }
+            if ($allCorrect) {
+                $halfPoints += 20 + ($allExact ? 40 : 0);
+            }
+        }
+        $totalPoints = $halfPoints / 2;
 
         // Accuracy hesaplama
         $accuracy = $totalPicks > 0 ? round(($correctPicks / $totalPicks) * 100, 2) : 0;

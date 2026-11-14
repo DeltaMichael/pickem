@@ -23,9 +23,10 @@ class UserScoreResource extends AbstractDatabaseResource
         return [
             Schema\Integer::make('userId'),
             Schema\Integer::make('seasonId')->nullable(),
-            Schema\Integer::make('totalPoints'),
+            Schema\Number::make('totalPoints'),
             Schema\Integer::make('totalPicks'),
             Schema\Integer::make('correctPicks'),
+            Schema\Integer::make('exactScoreCount')->get(fn (UserScore $score) => $score->exactScoreCount),
             Schema\Number::make('accuracy')->get(fn (UserScore $score) => $score->getAccuracyPercentage()),
             Schema\Integer::make('rank')->get(fn (UserScore $score) => $score->calculatedRank ?? (int) $score->calculateRank()),
             Schema\DateTime::make('createdAt')->nullable(),

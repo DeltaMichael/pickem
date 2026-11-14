@@ -8,6 +8,7 @@ export default class UserScore extends Model {
   totalPoints = Model.attribute<number>('totalPoints');
   totalPicks = Model.attribute<number>('totalPicks');
   correctPicks = Model.attribute<number>('correctPicks');
+  exactScoreCount = Model.attribute<number>('exactScoreCount');
   accuracy = Model.attribute<number>('accuracy');
 
   user = Model.hasOne<User>('user');

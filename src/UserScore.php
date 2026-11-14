@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property int $id
  * @property int $user_id
  * @property int|null $season_id
- * @property int $total_points
+ * @property float $total_points
  * @property int $total_picks
  * @property int $correct_picks
  * @property \Carbon\Carbon $created_at
@@ -36,6 +36,8 @@ class UserScore extends AbstractModel
      */
     public $calculatedRank;
 
+    public int $exactScoreCount = 0;
+
     protected $fillable = [
         'user_id',
         'season_id',
@@ -45,7 +47,7 @@ class UserScore extends AbstractModel
     ];
 
     protected $casts = [
-        'total_points' => 'integer',
+        'total_points' => 'float',
         'total_picks' => 'integer',
         'correct_picks' => 'integer',
         'created_at' => 'datetime',

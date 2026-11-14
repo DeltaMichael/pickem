@@ -90,6 +90,12 @@ export default class EventCard extends Component<EventCardAttrs> {
         )}
 
         <div className="EventCard-info">
+          {event.isSpecial() && (
+            <div>
+              <i className="fas fa-star" />
+              <strong>{app.translator.trans('huseyinfiliz-pickem.lib.form.special_match')}</strong>
+            </div>
+          )}
           <div>
             <i className="fas fa-calendar" />
             <strong>{app.translator.trans('huseyinfiliz-pickem.lib.headers.match_date')}:</strong> {matchDate}
@@ -152,6 +158,7 @@ export default class EventCard extends Component<EventCardAttrs> {
             <PredictedScoreForm
               key={`${pick.id()}-${pick.selectedOutcome()}`}
               pick={pick}
+              newScoring={event.newScoring()}
               firstTeam={String(firstTeam ? firstTeam.name() : firstTeamLabel)}
               secondTeam={String(secondTeam ? secondTeam.name() : secondTeamLabel)}
               reverse={reverse}

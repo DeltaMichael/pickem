@@ -24,7 +24,8 @@ class DeleteEventController extends AbstractDeleteController
         $id = Arr::get($request->getQueryParams(), 'id');
         $event = Event::findOrFail($id);
 
-        $affectedUserIds = Pick::where('event_id', $id)
+        $eventIds = null === $event->week_id ? [$id] : Event::where('week_id', $event->week_id)->pluck('id')->all();
+        $affectedUserIds = Pick::whereIn('event_id', $eventIds)
             ->distinct()
             ->pluck('user_id')
             ->all();
@@ -36,7 +37,7 @@ class DeleteEventController extends AbstractDeleteController
 
         foreach ($affectedUserIds as $userId) {
             $this->bus->dispatch(
-                new RecalculateUserScoreJob($userId)
+                (new RecalculateUserScoreJob($userId))->afterCommit()
             );
         }
     }

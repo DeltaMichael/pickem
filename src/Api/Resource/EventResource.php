@@ -27,6 +27,8 @@ class EventResource extends AbstractDatabaseResource
             Schema\DateTime::make('matchDate'),
             Schema\DateTime::make('cutoffDate'),
             Schema\Boolean::make('allowDraw'),
+            Schema\Boolean::make('isSpecial'),
+            Schema\Boolean::make('newScoring'),
             Schema\Str::make('status'),
             Schema\Integer::make('homeScore')->nullable(),
             Schema\Integer::make('awayScore')->nullable(),

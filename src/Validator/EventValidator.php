@@ -31,6 +31,7 @@ class EventValidator extends AbstractValidator
             'matchDate' => ['required', 'date'],
             'cutoffDate' => ['required', 'date', 'before:matchDate'],
             'allowDraw' => ['boolean'],
+            'isSpecial' => ['boolean'],
             'status' => ['string', Rule::in(['scheduled', 'closed', 'finished'])],
 
             'homeScore' => ['nullable', 'integer', 'min:0', 'required_with:awayScore'],

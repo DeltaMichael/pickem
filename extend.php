@@ -48,6 +48,7 @@ return [
         // Events (Matches)
         ->get('/pickem-events', 'pickem.events.index', Controller\ListEventsController::class)
         ->post('/pickem-events', 'pickem.events.create', Controller\CreateEventController::class)
+        ->post('/pickem-events/import', 'pickem.events.import', Controller\ImportEventsController::class)
         ->patch('/pickem-events/{id}', 'pickem.events.update', Controller\UpdateEventController::class)
         ->delete('/pickem-events/{id}', 'pickem.events.delete', Controller\DeleteEventController::class)
         ->post('/pickem-events/{id}/result', 'pickem.events.result', Controller\EnterEventResultController::class)

@@ -15,6 +15,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property Carbon $match_date
  * @property Carbon $cutoff_date
  * @property bool $allow_draw
+ * @property bool $new_scoring
+ * @property bool $is_special
  * @property string $status
  * @property int|null $home_score
  * @property int|null $away_score
@@ -42,6 +44,7 @@ class Event extends AbstractModel
         'match_date',
         'cutoff_date',
         'allow_draw',
+        'is_special',
         'status',
         'home_score',
         'away_score',
@@ -52,6 +55,8 @@ class Event extends AbstractModel
         'match_date' => 'datetime',
         'cutoff_date' => 'datetime',
         'allow_draw' => 'boolean',
+        'new_scoring' => 'boolean',
+        'is_special' => 'boolean',
         'home_score' => 'integer',
         'away_score' => 'integer',
         'created_at' => 'datetime',
@@ -74,12 +79,13 @@ class Event extends AbstractModel
      */
     protected static function booted()
     {
+        static::creating(function (Event $event) {
+            $event->new_scoring = true;
+        });
         // Auto-calculate result when scores are set
         static::saving(function (Event $event) {
             // Skorlar set edildiyse result'ı hesapla
-            if ($event->isDirty(['home_score', 'away_score'])
-                && null !== $event->home_score
-                && null !== $event->away_score) {
+            if ($event->isDirty(['home_score', 'away_score'])) {
                 $event->result = $event->calculateResult();
 
                 // Otomatik olarak finished'a çek

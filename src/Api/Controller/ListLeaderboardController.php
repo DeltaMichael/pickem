@@ -5,6 +5,8 @@ namespace HuseyinFiliz\Pickem\Api\Controller;
 use Flarum\Http\RequestUtil;
 use Flarum\Http\UrlGenerator;
 use HuseyinFiliz\Pickem\Api\Resource\UserScoreResource;
+use HuseyinFiliz\Pickem\Event;
+use HuseyinFiliz\Pickem\Pick;
 use HuseyinFiliz\Pickem\UserScore;
 use Illuminate\Support\Arr;
 use Psr\Http\Message\ServerRequestInterface;
@@ -49,6 +51,22 @@ class ListLeaderboardController extends AbstractListController
         $results = $query->limit($limit)
                          ->offset($offset)
                          ->get();
+
+        $exactCounts = Pick::query()
+            ->join('pickem_events', 'pickem_picks.event_id', '=', 'pickem_events.id')
+            ->whereIn('pickem_picks.user_id', $results->pluck('user_id'))
+            ->where('pickem_events.status', Event::STATUS_FINISHED)
+            ->whereColumn('pickem_picks.selected_outcome', 'pickem_events.result')
+            ->whereColumn('pickem_picks.predicted_home_score', 'pickem_events.home_score')
+            ->whereColumn('pickem_picks.predicted_away_score', 'pickem_events.away_score')
+            ->select('pickem_picks.user_id')
+            ->selectRaw('COUNT(*) as exact_count')
+            ->groupBy('pickem_picks.user_id')
+            ->pluck('exact_count', 'user_id');
+
+        $results->each(function (UserScore $score) use ($exactCounts) {
+            $score->exactScoreCount = (int) $exactCounts->get($score->user_id, 0);
+        });
 
         // N+1 Çözümü: Eğer belirli bir kullanıcı filtrelenmiyorsa (Genel Liste),
         // sıralamayı veritabanı yerine burada hesapla.

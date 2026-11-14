@@ -191,6 +191,11 @@ export default class PickemPage extends Page {
                 {this.renderTab('leaderboard', app.translator.trans('huseyinfiliz-pickem.lib.nav.leaderboard'))}
               </div>
 
+              <details>
+                <summary>{app.translator.trans('huseyinfiliz-pickem.forum.scoring.title')}</summary>
+                <p>{app.translator.trans('huseyinfiliz-pickem.forum.scoring.rules')}</p>
+              </details>
+
               {this.loading ? <LoadingIndicator /> : <div className="PickemPage-tabContent">{this.renderAllTabs()}</div>}
             </div>
           </div>

@@ -20,6 +20,7 @@ export default class EventModal extends FormModal<IEventModalAttrs> {
   private matchDate: string = '';
   private cutoffDate: string = '';
   private allowDraw: boolean = false;
+  private isSpecial: boolean = false;
   private status: string = 'scheduled';
   loading: boolean = false;
 
@@ -37,6 +38,7 @@ export default class EventModal extends FormModal<IEventModalAttrs> {
       this.matchDate = this.formatDateForInput(this.event.matchDate());
       this.cutoffDate = this.formatDateForInput(this.event.cutoffDate());
       this.allowDraw = this.event.allowDraw() || false;
+      this.isSpecial = this.event.isSpecial() || false;
       this.status = this.event.status() || 'scheduled';
     }
   }
@@ -209,6 +211,15 @@ export default class EventModal extends FormModal<IEventModalAttrs> {
           </div>
 
           <div className="Form-group">
+            {(!this.event || this.event.newScoring()) && (
+              <label className="checkbox">
+                <input type="checkbox" checked={this.isSpecial} onchange={(e: Event) => (this.isSpecial = (e.target as HTMLInputElement).checked)} />
+                {app.translator.trans('huseyinfiliz-pickem.lib.form.special_match')}
+              </label>
+            )}
+          </div>
+
+          <div className="Form-group">
             <label>{app.translator.trans('huseyinfiliz-pickem.lib.common.status')}</label>
             <Select
               className="FormControl"
@@ -275,6 +286,7 @@ export default class EventModal extends FormModal<IEventModalAttrs> {
       matchDate: matchDateIso,
       cutoffDate: cutoffDateIso,
       allowDraw: this.allowDraw,
+      isSpecial: this.isSpecial,
       status: this.status,
     };
 

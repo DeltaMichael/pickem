@@ -4,6 +4,7 @@ import Pick from '../../common/models/Pick';
 
 interface PredictedScoreFormAttrs {
   pick: Pick;
+  newScoring: boolean;
   firstTeam: string;
   secondTeam: string;
   reverse: boolean;
@@ -25,12 +26,15 @@ export default class PredictedScoreForm extends Component<PredictedScoreFormAttr
   }
 
   view() {
-    const { pick, reverse, firstTeam, secondTeam, isLoading, onSave } = this.attrs;
+    const { pick, reverse, firstTeam, secondTeam, isLoading, onSave, newScoring } = this.attrs;
+    const scoreLabel = app.translator.trans(
+      newScoring ? 'huseyinfiliz-pickem.forum.picks.exact_score_new' : 'huseyinfiliz-pickem.forum.picks.exact_score'
+    );
     if (!this.editing) {
       return (
         <div className="EventCard-predictedScore">
           <div>
-            {app.translator.trans('huseyinfiliz-pickem.forum.picks.exact_score')}: {reverse ? pick.predictedAwayScore() : pick.predictedHomeScore()} -{' '}
+            {scoreLabel}: {reverse ? pick.predictedAwayScore() : pick.predictedHomeScore()} -{' '}
             {reverse ? pick.predictedHomeScore() : pick.predictedAwayScore()}
           </div>
           <Button className="Button" onclick={() => (this.editing = true)}>
@@ -59,7 +63,7 @@ export default class PredictedScoreForm extends Component<PredictedScoreFormAttr
           });
         }}
       >
-        <div>{app.translator.trans('huseyinfiliz-pickem.forum.picks.exact_score')}</div>
+        <div>{scoreLabel}</div>
         <div className="EventCard-predictedScore-inputs">
           <label>
             {firstTeam}

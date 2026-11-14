@@ -103,6 +103,7 @@ export default class MyPicksTab extends Component<MyPicksTabAttrs> {
                     <span className="mobile-label">{app.translator.trans('huseyinfiliz-pickem.lib.common.match')}</span>
                     <span className="value">
                       {firstTeamName} {app.translator.trans('huseyinfiliz-pickem.lib.common.vs')} {secondTeamName}
+                      {event.isSpecial() && <div>{app.translator.trans('huseyinfiliz-pickem.lib.form.special_match')}</div>}
                     </span>
                   </div>
 

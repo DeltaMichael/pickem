@@ -5,6 +5,7 @@ import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
 import Placeholder from 'flarum/common/components/Placeholder';
 import Button from 'flarum/common/components/Button';
 import EventModal from './modals/EventModal';
+import ImportEventsModal from './modals/ImportEventsModal';
 import ResultModal from './modals/ResultModal';
 import PickemEvent from '../../common/models/Event';
 import Team from '../../common/models/Team';
@@ -99,18 +100,27 @@ export default class EventsTab extends Component {
             <i className="fas fa-calendar-alt" />
             {app.translator.trans('huseyinfiliz-pickem.lib.nav.matches')}
           </h3>
-          <Button
-            className="Button Button--primary"
-            icon="fas fa-plus"
-            onclick={() =>
-              app.modal.show(EventModal, {
-                event: null,
-                onsave: () => this.loadEvents(true),
-              })
-            }
-          >
-            {app.translator.trans('huseyinfiliz-pickem.lib.actions.create')}
-          </Button>
+          <div>
+            <Button
+              className="Button"
+              icon="fas fa-file-import"
+              onclick={() => app.modal.show(ImportEventsModal, { onsave: () => this.loadEvents(true) })}
+            >
+              {app.translator.trans('huseyinfiliz-pickem.admin.import.title')}
+            </Button>{' '}
+            <Button
+              className="Button Button--primary"
+              icon="fas fa-plus"
+              onclick={() =>
+                app.modal.show(EventModal, {
+                  event: null,
+                  onsave: () => this.loadEvents(true),
+                })
+              }
+            >
+              {app.translator.trans('huseyinfiliz-pickem.lib.actions.create')}
+            </Button>
+          </div>
         </div>
 
         <div className="EventsTab-filters">
@@ -246,6 +256,7 @@ export default class EventsTab extends Component {
                     <span className={`StatusBadge StatusBadge--${event.status()}`}>
                       {app.translator.trans(`huseyinfiliz-pickem.lib.status.${event.status()}`)}
                     </span>
+                    {event.isSpecial() && <div>{app.translator.trans('huseyinfiliz-pickem.lib.form.special_match')}</div>}
                   </div>
 
                   <div className="CardList-item-cell" data-label={app.translator.trans('huseyinfiliz-pickem.lib.common.score')}>
