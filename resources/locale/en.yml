@@ -60,6 +60,7 @@ huseyinfiliz-pickem:
       away_score: "Away Score"
       search_team: "Search Team..."
       select_week: "Select Week"
+      upload_logo: "Upload with FoF Upload"
     filters:
       sort: "Sort"
       newest: "Newest First"

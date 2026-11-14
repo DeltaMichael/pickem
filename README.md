@@ -155,7 +155,7 @@ You can configure permissions via the Flarum Permission grid:
 
 #### 🌍 Translations
 
-This extension comes with English translations. Community translations are welcome!
+This extension includes English and Bulgarian translations. To use Bulgarian, install and enable a compatible Bulgarian language pack and select Bulgarian in Flarum. Community translations are welcome!
 [![Translate](https://weblate.rob006.net/widgets/flarum/-/huseyinfiliz-pickem/multi-auto.svg)](https://weblate.rob006.net/projects/flarum/huseyinfiliz-pickem/)
 
 #### 💖 Support & Contributing

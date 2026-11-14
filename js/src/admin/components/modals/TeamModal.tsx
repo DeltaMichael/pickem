@@ -114,7 +114,7 @@ export default class TeamModal extends FormModal<ITeamModalAttrs> {
                       const fileInput = document.getElementById('pickem-logo-upload');
                       if (fileInput) fileInput.click();
                     }}
-                    title="Upload with FoF Upload"
+                    title={app.translator.trans('huseyinfiliz-pickem.lib.form.upload_logo')}
                     type="button"
                   />
                 </>
