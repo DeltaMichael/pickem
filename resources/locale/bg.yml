@@ -45,7 +45,7 @@ huseyinfiliz-pickem:
       week_number: "Номер на седмицата"
     form:
       name: "Име"
-      slug: "Адрес"
+      slug: "Слъг"
       logo_url: "URL на логото"
       start_date: "Начална дата"
       end_date: "Крайна дата"
